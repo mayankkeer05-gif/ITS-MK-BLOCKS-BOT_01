@@ -1,13 +1,13 @@
 {
-  "name": "AFK Bot",
+  "name": "ITS_MK_BOT_01",
   "bot-account": {
-    "username": "SoloCloudHosting",
+    "username": "ITS_MK_BOT_01",
     "password": "",
     "type": "offline"
   },
   "server": {
-    "ip": "solocloud.host",
-    "port": 25565,
+    "ip": "ITS-MK-BLOCKS.aternos.me",
+    "port": 45083,
     "version": "1.20.1",
     "try-creative": false
   },
@@ -20,7 +20,7 @@
   "utils": {
     "auto-auth": {
       "enabled": true,
-      "password": "SoloPlayz"
+      "password": "9876543210"
     },
     "anti-afk": {
       "enabled": true,
@@ -29,11 +29,9 @@
     "chat-messages": {
       "enabled": true,
       "repeat": true,
-      "repeat-delay": 120,
+      "repeat-delay": 10000000,
       "messages": [
-        "I'm a regular player",
-        "Subscribe to SoloPlayz!",
-        "Want Cheap Premium MC Server? https://discord.gg/VRMUnDkf95"
+        "MADE BY ITS_MK_PLAYS",
       ]
     },
     "chat-log": true,
