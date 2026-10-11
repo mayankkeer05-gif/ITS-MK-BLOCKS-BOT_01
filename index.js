@@ -33,6 +33,8 @@ const DEFAULT_CONFIG = {
   beds: { "pick-up-day": false, "place-night": false },
   discord: { enabled: false, webhookUrl: "", events: { connect: true, disconnect: true, chat: false } },
   chat: { respond: false, admins: [] },
+  // physics OFF = bot stands still and never sends movement packets (stable on brand-new versions)
+  physics: { enabled: false },
   // Scheduled leave/rejoin cycle: stay online "stay-minutes", leave, wait "away-seconds", rejoin.
   "leave-rejoin": { enabled: false, "stay-minutes": 30, "away-seconds": 10 },
 };
@@ -87,7 +89,7 @@ let botState = {
   plannedLeave: false,
   nextLeaveAt: 0,
   useNewestSupported: false,
-  safeMode: false,
+  safeMode: !(config.physics && config.physics.enabled),
   reconnectAttempts: 0,
   startTime: Date.now(),
   errors: [],
@@ -1310,6 +1312,9 @@ function installPacketGuard(b) {
   let dropped = 0;
 
   client.write = (name, params) => {
+    // Static mode: the bot never sends ANY movement/look packet, so the server has nothing
+    // it could reject as "Invalid move player packet" (teleport confirmations still go through).
+    if (botState.safeMode && MOVE_PACKETS.has(name)) return;
     if (MOVE_PACKETS.has(name) && params) {
       const bad = ["x", "y", "z", "yaw", "pitch"].filter((k) => k in params && !Number.isFinite(params[k]));
       if (bad.length) {
@@ -1409,8 +1414,11 @@ function createBot() {
       version: botVersion,
       hideErrors: false,
       checkTimeoutInterval: 120000,
+      physicsEnabled: !botState.safeMode,
     });
+    thisBot.physicsEnabled = !botState.safeMode;
     bot = thisBot;
+    if (botState.safeMode) addLog("[Bot] Static mode: physics disabled, no movement packets will be sent");
 
     installPacketGuard(thisBot);
     thisBot.loadPlugin(pathfinder);
@@ -1524,7 +1532,7 @@ function createBot() {
         botState.wasThrottled = true;
       }
       if (reasonStr.includes("invalid_player_movement") || reasonStr.includes("invalid move")) {
-        addLog("[Bot] Server rejected a movement packet - enabling SAFE MODE (no walking/sneaking/look-around) so the bot can stay online");
+        addLog("[Bot] Server rejected a movement packet - next join uses static mode (physics off)");
         botState.safeMode = true;
       }
 
@@ -1947,7 +1955,7 @@ function combatModule(bot, mcData) {
   const isHostile = (e) =>
     e && e.type === "mob" && e.position && (e.kind === "Hostile mobs" || e.kind === "Hostile");
 
-  bot.on("physicsTick", () => {
+  addInterval(() => {
     if (!bot || !botState.connected || !bot.entity) return;
     if (!config.combat["attack-mobs"]) return;
 
@@ -1976,7 +1984,7 @@ function combatModule(bot, mcData) {
     } catch (e) {
       addLog(`[Combat] Error: ${e.message}`);
     }
-  });
+  }, 250);
 
   bot.on("health", () => {
     if (!config.combat["auto-eat"] || isEating) return;
@@ -2271,6 +2279,7 @@ addLog("  Minecraft AFK Bot v3.0");
 addLog("=".repeat(50));
 addLog(`Server: ${config.server.ip}:${config.server.port}`);
 addLog("Version: auto-detect (latest from server)");
+addLog(`Mode: ${botState.safeMode ? "static (physics off)" : "full physics"}`);
 addLog(config["leave-rejoin"].enabled ? `Rest cycle: stay ${config["leave-rejoin"]["stay-minutes"]} min, away ${config["leave-rejoin"]["away-seconds"]}s` : "Rest cycle: disabled");
 if (!DASHBOARD_PASSWORD) {
   addLog("[Security] DASHBOARD_PASSWORD is not set - the web dashboard/console is publicly accessible!");
