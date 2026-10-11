@@ -8,8 +8,13 @@
   "server": {
     "ip": "ITS-MK-BLOCKS.aternos.me",
     "port": 45083,
-    "version": "1.21.11",
+    "version": "",
     "try-creative": false
+  },
+  "leave-rejoin": {
+    "enabled": true,
+    "stay-minutes": 30,
+    "away-seconds": 10
   },
   "position": {
     "enabled": false,
@@ -24,39 +29,37 @@
     },
     "anti-afk": {
       "enabled": true,
-      "sneak": true
+      "sneak": false
     },
     "chat-messages": {
       "enabled": false,
       "repeat": false,
-      "repeat-delay": 120000000,
-      "messages": [
-        "MADE BY ITS_MK_PLAYS"
-      ]
+      "repeat-delay": 1000,
+      "messages": ["MADE BY ITS_MK_PLAYS"]
     },
     "chat-log": true,
     "auto-reconnect": true,
     "auto-reconnect-delay": 3000,
-    "max-reconnect-delay": 100000
+    "max-reconnect-delay": 60000
   },
   "movement": {
     "enabled": true,
     "circle-walk": {
       "enabled": true,
-      "radius": 4,
-      "speed": 3000
+      "radius": 3,
+      "speed": 4000
     },
     "look-around": {
       "enabled": true,
-      "interval": 5000
+      "interval": 6000
     },
     "random-jump": {
-      "enabled": true,
+      "enabled": false,
       "interval": 10000
     }
   },
   "modules": {
-    "avoidMobs": true,
+    "avoidMobs": false,
     "combat": true,
     "beds": false,
     "chat": true,
@@ -80,6 +83,7 @@
     }
   },
   "chat": {
-    "respond": true
+    "respond": true,
+    "admins": []
   }
 }
