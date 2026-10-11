@@ -264,6 +264,7 @@ app.get('/', (req, res) => {
     </html>
   `);
 });
+
 app.get("/tutorial", (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -748,7 +749,7 @@ app.get("/logs", (req, res) => {
               <h1>Bot Logs</h1>
               <p>Live output from the AFK bot</p>
             </div>
-            <span class="badge">${logCount} ${logCount === 1 ? "entry" : "entries"}</span>
+            <span class="badge">${logCount}${logCount === 1 ? "entry" : "entries"}</span>
           </div>
 
           <div class="log-card">
@@ -758,146 +759,4 @@ app.get("/logs", (req, res) => {
               <span class="dot dot-green"></span>
               <span class="log-card-title">bot.log</span>
             </div>
-            <div class="log-body" id="log-body">
-              ${logCount === 0
-                ? `<div class="empty-state">No log entries yet. Start the bot to see output.</div>`
-                : logs.map((l) => {
-                    const escaped = escapeHTML(l);
-                    const lower = l.toLowerCase();
-                    let cls = "default";
-                    if (lower.includes("error") || lower.includes("fail")) cls = "error";
-                    else if (lower.includes("warn")) cls = "warn";
-                    else if (lower.includes("[control]")) cls = "control";
-                    else if (lower.includes("connect") || lower.includes("join") || lower.includes("spawn")) cls = "success";
-                    return `<span class="log-entry ${cls}">${escaped}</span>`;
-                  }).join("")
-              }
-            </div>
-            <div class="console-wrap">
-              <div class="cmd-suggestions" id="cmd-suggestions"></div>
-              <div class="console-row">
-                <span class="console-prompt">&gt;</span>
-                <input
-                  id="console-input"
-                  class="console-input"
-                  type="text"
-                  placeholder="Type / for commands, or any message…"
-                  autocomplete="off"
-                  spellcheck="false"
-                >
-                <button id="console-send" class="console-send">Send</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="refresh-bar">
-            <span class="refresh-dot"></span>
-            <span id="refresh-label">Auto-refreshing every 5 seconds</span>
-          </div>
-
-          <footer>
-            <p>AFK Bot Dashboard &middot; ${config.name}</p>
-          </footer>
-        </main>
-
-        <script>
-          (function() {
-            var logBody  = document.getElementById('log-body');
-            var input    = document.getElementById('console-input');
-            var sendBtn  = document.getElementById('console-send');
-            var label    = document.getElementById('refresh-label');
-            var sugBox   = document.getElementById('cmd-suggestions');
-            var refreshTimer = null;
-            var typing = false;
-            var activeIdx = -1;
-
-            var COMMANDS = [
-              { name: '/help',   desc: 'Show all available commands' },
-              { name: '/pos',    desc: "Show bot's current coordinates" },
-              { name: '/status', desc: 'Show connection status & uptime' },
-              { name: '/list',   desc: 'List players on the server' },
-              { name: '/say',    desc: 'Send a chat message in-game' },
-            ];
-
-            function scrollBottom() {
-              if (logBody) logBody.scrollTop = logBody.scrollHeight;
-            }
-
-            function scheduleRefresh() {
-              clearTimeout(refreshTimer);
-              if (!typing) {
-                refreshTimer = setTimeout(function() { location.reload(); }, 5000);
-              }
-            }
-
-            function appendLocalEntry(text, cls) {
-              var span = document.createElement('span');
-              span.className = 'log-entry ' + (cls || 'control');
-              span.textContent = text;
-              logBody.appendChild(span);
-              scrollBottom();
-            }
-
-            function hideSuggestions() {
-              sugBox.classList.remove('visible');
-              sugBox.innerHTML = '';
-              activeIdx = -1;
-            }
-
-            function setActive(idx) {
-              var items = sugBox.querySelectorAll('.cmd-item');
-              items.forEach(function(el, i) {
-                el.classList.toggle('active', i === idx);
-              });
-              activeIdx = idx;
-            }
-
-            function showSuggestions(val) {
-              var query = val.toLowerCase();
-              var matches = COMMANDS.filter(function(c) {
-                return c.name.startsWith(query);
-              });
-
-              if (!matches.length) { hideSuggestions(); return; }
-
-              sugBox.innerHTML = matches.map(function(c, i) {
-                return '<div class="cmd-item" data-cmd="' + c.name + '">' +
-                  '<span class="cmd-name">' + c.name + '</span>' +
-                  '<span class="cmd-desc">' + c.desc + '</span>' +
-                '</div>';
-              }).join('');
-
-              sugBox.querySelectorAll('.cmd-item').forEach(function(el) {
-                el.addEventListener('mousedown', function(e) {
-                  e.preventDefault();
-                  input.value = el.dataset.cmd + ' ';
-                  hideSuggestions();
-                  input.focus();
-                });
-              });
-
-              activeIdx = -1;
-              sugBox.classList.add('visible');
-            }
-
-            input.addEventListener('input', function() {
-              var val = input.value;
-              if (val.startsWith('/')) {
-                showSuggestions(val);
-              } else {
-                hideSuggestions();
-              }
-            });
-
-            input.addEventListener('keydown', function(e) {
-              var items = sugBox.querySelectorAll('.cmd-item');
-              if (sugBox.classList.contains('visible') && items.length) {
-                if (e.key === 'ArrowDown') {
-                  e.preventDefault();
-                  setActive(Math.min(activeIdx + 1, items.length - 1));
-                  return;
-                }
-                if (e.key === 'ArrowUp') {
-                  e.preventDefault();
-                  setActive(Math.max(activeIdx - 1, 0));
-               
+            <div class="log-body" id="log-body
