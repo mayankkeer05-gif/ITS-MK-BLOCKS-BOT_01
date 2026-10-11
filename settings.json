@@ -51,7 +51,7 @@
       "interval": 5000
     },
     "random-jump": {
-      "enabled": true,
+      "enabled": false,
       "interval": 10000
     }
   },
@@ -84,7 +84,7 @@
   },
   "leave-rejoin": {
     "enabled": true,
-    "stay-seconds": 600,
-    "away-seconds": 30
+    "stay-seconds": 6000,
+    "away-seconds": 60
   }
 }
