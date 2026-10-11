@@ -11,6 +11,9 @@
     "version": "",
     "try-creative": false
   },
+  "physics": {
+    "enabled": true
+  },
   "leave-rejoin": {
     "enabled": true,
     "stay-minutes": 60,
@@ -28,7 +31,7 @@
       "password": "9876543210"
     },
     "anti-afk": {
-      "enabled": true,
+      "enabled": false,
       "sneak": false
     },
     "chat-messages": {
@@ -45,12 +48,12 @@
   "movement": {
     "enabled": true,
     "circle-walk": {
-      "enabled": true,
+      "enabled": false,
       "radius": 3,
       "speed": 4000
     },
     "look-around": {
-      "enabled": true,
+      "enabled": false,
       "interval": 6000
     },
     "random-jump": {
