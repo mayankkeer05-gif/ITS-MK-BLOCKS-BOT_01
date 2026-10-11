@@ -24,31 +24,31 @@
     },
     "anti-afk": {
       "enabled": true,
-      "sneak": false
+      "sneak": true
     },
     "chat-messages": {
       "enabled": true,
-      "repeat": false,
-      "repeat-delay": 300000,
+      "repeat": true,
+      "repeat-delay": 12000000,
       "messages": [
         "MADE BY ITS_MK_PLAYS"
       ]
     },
     "chat-log": true,
     "auto-reconnect": true,
-    "auto-reconnect-delay": 30000,
-    "max-reconnect-delay": 1800000
+    "auto-reconnect-delay": 2000,
+    "max-reconnect-delay": 60000
   },
   "movement": {
-    "enabled": false,
+    "enabled": true,
     "circle-walk": {
-      "enabled": false,
+      "enabled": true,
       "radius": 4,
       "speed": 3000
     },
     "look-around": {
-      "enabled": false,
-      "interval": 20000
+      "enabled": true,
+      "interval": 5000
     },
     "random-jump": {
       "enabled": false,
@@ -56,8 +56,8 @@
     }
   },
   "modules": {
-    "avoidMobs": false,
-    "combat": false,
+    "avoidMobs": true,
+    "combat": true,
     "beds": false,
     "chat": true,
     "console-commands": true
@@ -80,11 +80,11 @@
     }
   },
   "chat": {
-    "respond": false
+    "respond": true
   },
   "leave-rejoin": {
-    "enabled": false,
-    "stay-seconds": 6000,
-    "away-seconds": 60
+    "enabled": true,
+    "stay-seconds": 600,
+    "away-seconds": 30
   }
 }
