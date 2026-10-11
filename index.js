@@ -33,6 +33,8 @@ const DEFAULT_CONFIG = {
   beds: { "pick-up-day": false, "place-night": false },
   discord: { enabled: false, webhookUrl: "", events: { connect: true, disconnect: true, chat: false } },
   chat: { respond: false, admins: [] },
+  // Scheduled leave/rejoin cycle: stay online "stay-minutes", leave, wait "away-seconds", rejoin.
+  "leave-rejoin": { enabled: false, "stay-minutes": 30, "away-seconds": 10 },
 };
 
 function deepMerge(base, extra) {
@@ -82,6 +84,8 @@ let botState = {
   connected: false,
   lastActivity: Date.now(),
   connectedAt: 0,
+  plannedLeave: false,
+  nextLeaveAt: 0,
   useNewestSupported: false,
   safeMode: false,
   reconnectAttempts: 0,
@@ -534,6 +538,7 @@ app.get("/health", (req, res) => {
     coords: bot && bot.entity ? bot.entity.position : null,
     lastActivity: botState.lastActivity,
     reconnectAttempts: botState.reconnectAttempts,
+    nextLeaveIn: botState.nextLeaveAt ? Math.max(0, Math.round((botState.nextLeaveAt - Date.now()) / 1000)) : null,
     memoryUsage: process.memoryUsage().heapUsed / 1024 / 1024,
   });
 });
@@ -1100,7 +1105,7 @@ app.post("/command", express.json(), (req, res) => {
   if (cmd === "/status") {
     const status = botState.connected ? "Connected" : "Disconnected";
     const uptime = Math.floor((Date.now() - botState.startTime) / 1000);
-    const msg = `Status: ${status} | Uptime: ${uptime}s | Reconnects: ${botState.reconnectAttempts}`;
+    const msg = `Status: ${status} | Uptime: ${uptime}s | Reconnects: ${botState.reconnectAttempts}${botState.nextLeaveAt ? ` | Next rest in: ${Math.max(0, Math.round((botState.nextLeaveAt - Date.now()) / 60000))}min` : ""}`;
     addLog(`[Console] ${msg}`);
     return res.json({ success: true, msg });
   }
@@ -1202,7 +1207,18 @@ let reconnectTimeoutId = null;
 let connectionTimeoutId = null;
 let isReconnecting = false;
 
+let leaveTimeoutId = null;
+
+function clearLeaveTimer() {
+  if (leaveTimeoutId) {
+    clearTimeout(leaveTimeoutId);
+    leaveTimeoutId = null;
+  }
+  botState.nextLeaveAt = 0;
+}
+
 function clearBotTimeouts() {
+  clearLeaveTimer();
   if (reconnectTimeoutId) {
     clearTimeout(reconnectTimeoutId);
     reconnectTimeoutId = null;
@@ -1425,6 +1441,28 @@ function createBot() {
       isReconnecting = false;
 
       addLog(`[Bot] [+] Successfully spawned on server! (Version: ${thisBot.version})`);
+      botState.plannedLeave = false;
+
+      const lr = config["leave-rejoin"];
+      if (lr.enabled) {
+        const stayMs = Math.max(0.1, Number(lr["stay-minutes"]) || 30) * 60 * 1000;
+        botState.nextLeaveAt = Date.now() + stayMs;
+        leaveTimeoutId = setTimeout(() => {
+          leaveTimeoutId = null;
+          if (bot !== thisBot || !botState.connected) return;
+          addLog(`[Sleep] Stay time over - leaving the server for ${Number(lr["away-seconds"]) || 10}s`);
+          botState.plannedLeave = true;
+          botState.nextLeaveAt = 0;
+          clearAllIntervals();
+          try {
+            thisBot.quit("Scheduled rest");
+          } catch (e) {
+            addLog(`[Sleep] Quit error: ${e.message}`);
+            botState.plannedLeave = false;
+          }
+        }, stayMs);
+        addLog(`[Sleep] Will leave in ${Math.round(stayMs / 60000)} min, rejoin ${Number(lr["away-seconds"]) || 10}s later`);
+      }
       if (config.discord.events.connect) {
         sendDiscordWebhook(`[+] **Connected** to \`${config.server.ip}\``, 0x4ade80);
       }
@@ -1508,6 +1546,16 @@ function createBot() {
         botState.reconnectAttempts = 0;
       }
       botState.connectedAt = 0;
+      clearLeaveTimer();
+
+      if (botState.plannedLeave) {
+        // Planned rest: rejoin after exactly "away-seconds", no backoff, not counted as a failure
+        botState.plannedLeave = false;
+        botState.reconnectAttempts = 0;
+        const awayMs = Math.max(1, Number(config["leave-rejoin"]["away-seconds"]) || 10) * 1000;
+        scheduleReconnect(awayMs);
+        return;
+      }
 
       if (config.discord.events.disconnect) {
         sendDiscordWebhook(`[-] **Disconnected**: ${reason || "Unknown"}`, 0xf87171);
@@ -1532,7 +1580,7 @@ function createBot() {
   }
 }
 
-function scheduleReconnect() {
+function scheduleReconnect(fixedDelayMs) {
   if (!botRunning) {
     addLog("[Bot] Bot is stopped - not reconnecting.");
     return;
@@ -1552,10 +1600,15 @@ function scheduleReconnect() {
   }
 
   isReconnecting = true;
-  botState.reconnectAttempts++;
-
-  const delay = getReconnectDelay();
-  addLog(`[Bot] Reconnecting in ${Math.round(delay / 1000)}s (attempt #${botState.reconnectAttempts})`);
+  let delay;
+  if (fixedDelayMs) {
+    delay = fixedDelayMs;
+    addLog(`[Sleep] Sleeping ${Math.round(delay / 1000)}s, then rejoining`);
+  } else {
+    botState.reconnectAttempts++;
+    delay = getReconnectDelay();
+    addLog(`[Bot] Reconnecting in ${Math.round(delay / 1000)}s (attempt #${botState.reconnectAttempts})`);
+  }
 
   reconnectTimeoutId = setTimeout(() => {
     reconnectTimeoutId = null;
@@ -2217,7 +2270,8 @@ addLog("=".repeat(50));
 addLog("  Minecraft AFK Bot v3.0");
 addLog("=".repeat(50));
 addLog(`Server: ${config.server.ip}:${config.server.port}`);
-addLog(`Version: ${config.server.version || "auto-detect"}`);
+addLog("Version: auto-detect (latest from server)");
+addLog(config["leave-rejoin"].enabled ? `Rest cycle: stay ${config["leave-rejoin"]["stay-minutes"]} min, away ${config["leave-rejoin"]["away-seconds"]}s` : "Rest cycle: disabled");
 if (!DASHBOARD_PASSWORD) {
   addLog("[Security] DASHBOARD_PASSWORD is not set - the web dashboard/console is publicly accessible!");
 }
