@@ -13,8 +13,8 @@
   },
   "leave-rejoin": {
     "enabled": true,
-    "stay-minutes": 30,
-    "away-seconds": 10
+    "stay-minutes": 60,
+    "away-seconds": 15
   },
   "position": {
     "enabled": false,
@@ -54,7 +54,7 @@
       "interval": 6000
     },
     "random-jump": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10000
     }
   },
