@@ -6,7 +6,7 @@
     "type": "offline"
   },
   "server": {
-    "ip": "ITS-MK-BLOCKS.aternos.me:45083",
+    "ip": "ITS-MK-BLOCKS.aternos.me",
     "port": 45083,
     "version": "1.21.11",
     "try-creative": false
