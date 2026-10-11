@@ -29,15 +29,15 @@
     "chat-messages": {
       "enabled": true,
       "repeat": true,
-      "repeat-delay": 120,
+      "repeat-delay": 1200000,
       "messages": [
         "MADE BY ITS_MK_PLAYS"
       ]
     },
     "chat-log": true,
     "auto-reconnect": true,
-    "auto-reconnect-delay": 2000,
-    "max-reconnect-delay": 60000
+    "auto-reconnect-delay": 30000,
+    "max-reconnect-delay": 1800000
   },
   "movement": {
     "enabled": true,
