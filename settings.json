@@ -16,7 +16,7 @@
   },
   "leave-rejoin": {
     "enabled": true,
-    "stay-minutes": 60,
+    "stay-minutes": 10,
     "away-seconds": 15
   },
   "position": {
@@ -54,11 +54,11 @@
     },
     "look-around": {
       "enabled": true,
-      "interval": 1000
+      "interval": 10
     },
     "random-jump": {
       "enabled": true,
-      "interval": 10
+      "interval": 5
     }
   },
   "modules": {
