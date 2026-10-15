@@ -54,11 +54,11 @@
     },
     "look-around": {
       "enabled": true,
-      "interval": 5
+      "interval": 10
     },
     "random-jump": {
       "enabled": true,
-      "interval": 1
+      "interval": 10
     }
   },
   "modules": {
