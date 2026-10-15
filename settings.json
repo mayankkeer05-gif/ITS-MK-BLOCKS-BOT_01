@@ -16,7 +16,7 @@
   },
   "leave-rejoin": {
     "enabled": true,
-    "stay-minutes": 10,
+    "stay-minutes": 5,
     "away-seconds": 15
   },
   "position": {
@@ -48,17 +48,17 @@
   "movement": {
     "enabled": true,
     "circle-walk": {
-      "enabled": false,
-      "radius": 3,
+      "enabled": true,
+      "radius": 1,
       "speed": 4000
     },
     "look-around": {
       "enabled": true,
-      "interval": 10
+      "interval": 5
     },
     "random-jump": {
       "enabled": true,
-      "interval": 5
+      "interval": 1
     }
   },
   "modules": {
