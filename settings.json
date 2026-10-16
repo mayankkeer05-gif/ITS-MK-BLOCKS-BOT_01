@@ -6,8 +6,8 @@
     "type": "offline"
   },
   "server": {
-    "ip": "ITS-MK-BLOCKS.aternos.me",
-    "port": 45083,
+    "ip": "ITS-FRIEND-ONLY-SMP.aternos.me",
+    "port": 37984,
     "version": "",
     "try-creative": false
   },
@@ -17,7 +17,7 @@
   "leave-rejoin": {
     "enabled": true,
     "stay-minutes": 5,
-    "away-seconds": 15
+    "away-seconds": 30
   },
   "position": {
     "enabled": false,
