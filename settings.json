@@ -17,7 +17,7 @@
   "leave-rejoin": {
     "enabled": true,
     "stay-minutes": 5,
-    "away-seconds": 30
+    "away-seconds": 15
   },
   "position": {
     "enabled": false,
